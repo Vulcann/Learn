@@ -25,8 +25,8 @@ package object nodescala {
      *  This future may be useful when testing if timeout logic works correctly.
      */
     def never[T]: Future[T] = {
-      Promise[T]().failure(new Exception).future // complete with failure
-      // Promise[T]().future // never complete
+      Promise[T]().future // never complete
+      // Promise[T]().failure(new Exception).future // complete with failure
     }
 
     /** Given a list of futures `fs`, returns the future holding the list of values of all the futures from `fs`.
@@ -101,7 +101,7 @@ package object nodescala {
         Await.result(f, 0 second)
       }
       catch {
-        case Exception => throw new NoSuchElementException
+        case NonFatal(t) => throw new NoSuchElementException
       }
     }
 
