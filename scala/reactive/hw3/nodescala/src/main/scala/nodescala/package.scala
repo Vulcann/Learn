@@ -25,7 +25,8 @@ package object nodescala {
      *  This future may be useful when testing if timeout logic works correctly.
      */
     def never[T]: Future[T] = {
-      Promise[T]().failure(new Exception).future
+      Promise[T]().failure(new Exception).future // complete with failure
+      // Promise[T]().future // never complete
     }
 
     /** Given a list of futures `fs`, returns the future holding the list of values of all the futures from `fs`.
@@ -64,6 +65,7 @@ package object nodescala {
       blocking[Unit] {
         Thread sleep t.toMillis
       }
+      // () why add () ?
     }
 
     /** Completes this future with user input.
@@ -74,7 +76,11 @@ package object nodescala {
 
     /** Creates a cancellable context for an execution and runs it.
      */
-    def run()(f: CancellationToken => Future[Unit]): Subscription = ???
+    def run()(f: CancellationToken => Future[Unit]): Subscription = {
+      val cts = CancellationTokenSource()
+      f(cts.cancellationToken)
+      cts
+    }
 
   }
 
@@ -90,7 +96,14 @@ package object nodescala {
      *  However, it is also non-deterministic -- it may throw or return a value
      *  depending on the current state of the `Future`.
      */
-    def now: T = ???
+    def now: T = {
+      try {
+        Await.result(f, 0 second)
+      }
+      catch {
+        case Exception => throw new NoSuchElementException
+      }
+    }
 
     /** Continues the computation of this future by taking the current future
      *  and mapping it into another future.
@@ -98,7 +111,19 @@ package object nodescala {
      *  The function `cont` is called only after the current future completes.
      *  The resulting future contains a value returned by `cont`.
      */
-    def continueWith[S](cont: Future[T] => S): Future[S] = ???
+    def continueWith[S](cont: Future[T] => S): Future[S] = {
+      val p = Promise[S]()
+      f onComplete {
+        case f: Failure[_] => p complete f.asInstanceOf[Failure[S]]
+        case Success(v) => try cont(f) match {
+          case contf => p complete new Success[S](contf)
+          // case contf => p complete new Try(contf)
+        } catch {
+          case NonFatal(t) => p failure t
+        }
+      }
+      p.future
+    }
 
     /** Continues the computation of this future by taking the result
      *  of the current future and mapping it into another future.
@@ -106,7 +131,18 @@ package object nodescala {
      *  The function `cont` is called only after the current future completes.
      *  The resulting future contains a value returned by `cont`.
      */
-    def continue[S](cont: Try[T] => S): Future[S] = ???
+    def continue[S](cont: Try[T] => S): Future[S] = {
+      val p = Promise[S]()
+      f onComplete {
+        case f: Failure[_] => p complete f.asInstanceOf[Failure[S]]
+        case Success(v) => try cont(Try(v)) match {
+          case s => p success s
+        } catch {
+          case NonFatal(t) => p failure t
+        }
+      }
+      p.future
+    }
 
   }
 
@@ -141,7 +177,7 @@ package object nodescala {
    *  returns a `cancellationToken` which is cancelled by calling `unsubscribe`.
    *  
    *  After calling `unsubscribe` once, the associated `cancellationToken` will
-   *  forever remain cancelled -- its `isCancelled` will return `false.
+   *  forever remain cancelled -- its `isCancelled` will return `false`.
    */
   trait CancellationTokenSource extends Subscription {
     def cancellationToken: CancellationToken
@@ -152,7 +188,13 @@ package object nodescala {
   object CancellationTokenSource {
     /** Creates a new `CancellationTokenSource`.
      */
-    def apply(): CancellationTokenSource = ???
+    def apply(): CancellationTokenSource = new CancellationTokenSource {
+      val p = Promise[Unit]()
+      val cancellationToken = new CancellationToken {
+        override def isCancelled: Boolean = p.future.value != None
+      }
+      def unsubscribe(): Unit = p.trySuccess(())
+    }
   }
 
 }
