@@ -11,6 +11,8 @@ import java.util.concurrent.{Executor, ThreadPoolExecutor, TimeUnit, LinkedBlock
 import com.sun.net.httpserver.{HttpExchange, HttpHandler, HttpServer}
 import java.net.InetSocketAddress
 
+import scala.util.{Try, Success}
+
 /** Contains utilities common to the NodeScala© framework.
  */
 trait NodeScala {
@@ -27,9 +29,19 @@ trait NodeScala {
    *
    *  @param exchange     the exchange used to write the response back
    *  @param token        the cancellation token for
-   *  @param body         the response to write back
+   *  @param response     the response to write back
    */
-  private def respond(exchange: Exchange, token: CancellationToken, response: Response): Unit = ???
+  private def respond(exchange: Exchange, token: CancellationToken, response: Response): Unit = {
+    Future.run() { token =>
+      Future {
+        for {
+          r <- response
+          if token.nonCancelled
+        } exchange.write(r)
+        exchange close
+      }
+    }
+  }
 
   /** A server:
    *  1) creates and starts an http listener
@@ -41,7 +53,36 @@ trait NodeScala {
    *  @param handler        a function mapping a request to a response
    *  @return               a subscription that can stop the server and all its asynchronous operations *entirely*.
    */
-  def start(relativePath: String)(handler: Request => Response): Subscription = ???
+  def start(relativePath: String)(handler: Request => Response): Subscription = {
+    val listener = createListener(relativePath)
+    val ls = listener.start()
+
+    def handleCancelableRequest(token: CancellationToken): Future[Unit] = {
+      val f = Future {
+        val xchg: Future[(Request, Exchange)] = listener nextRequest()
+        xchg onComplete {
+          case Success((r, x)) => {
+
+            // 1) handle current request
+            respond(x, token, handler(r))
+
+            // 2) handle next request
+            while (token.nonCancelled) {
+              handleCancelableRequest(token)
+            }
+          }
+        }
+      }
+      f onComplete {
+        case _ => ls.unsubscribe()
+      }
+      f
+    }
+
+    Future.run() {
+      handleCancelableRequest
+    }
+  }
 
 }
 
@@ -111,7 +152,17 @@ object NodeScala {
      *  @param relativePath    the relative path on which we want to listen to requests
      *  @return                the promise holding the pair of a request and an exchange object
      */
-    def nextRequest(): Future[(Request, Exchange)] = ???
+    def nextRequest(): Future[(Request, Exchange)] = {
+      val p = Promise[(Request, Exchange)]()
+      def handler(xchg: Exchange): Unit = {
+        p complete {
+          Try((xchg.request, xchg))
+        }
+        removeContext()
+      }
+      createContext(handler)
+      p.future
+    }
   }
 
   object Listener {
