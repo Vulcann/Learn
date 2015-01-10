@@ -68,15 +68,41 @@ trait NodeScala {
     val responseCancelHandle = Future.run() { token =>
       async {
         while(token.nonCancelled) {
+
+          // the normal pattern to handle socket connection request
+          // waiting for the request from port
           val (req, xchg) = await(listener.nextRequest())
 
+          val resp = handler(req)
+          respond(xchg, token, resp)
+
+          /*
           // take the user given method "handler" to generate response
           // actually this part code should also be done asynchronously,
           // because "handler" is beyond control of the server logic and it could take quite long to complete.
           // how to ?
-          val resp = handler(req)
 
-          respond(xchg, token, resp)
+          // solution to handle long handler function which may block: just like nextRequest
+          // 1) make a promise for the required result
+          val p = Promise[Response]()
+          // 2) register respond method to the complete callback for the future of this promise
+          p.future onComplete {
+            case Success(resp) => respond(xchg, token, resp)
+          }
+          // 3) given this promise "p" to the user "handler" function itself
+          // let client handler method to satisfy the promise
+          //
+          // 3.1) create a callback method to handle the promise
+          def handleResponse(resp: Response): Unit = {
+            p.complete {
+              Try(resp)
+            }
+          }
+          // 3.2) give the callback method to the handler
+          // the handler needs specified signiture, just as defined as following
+          def asynHandler(handle: Response => Unit): Unit = ???
+          asynHandler(handleResponse)
+          */
         }
 
         // stop the listener when user cancels subscription
@@ -84,32 +110,6 @@ trait NodeScala {
       }
     }
     Subscription(listenerCancelHandle, responseCancelHandle)
-//
-//    def handleCancelableRequest(token: CancellationToken): Unit = {
-//      val xchg: Future[(Request, Exchange)] = listener nextRequest()
-//      blocking{
-//        Await.ready(xchg, 20 seconds)
-//      }
-//      xchg onComplete {
-//        case Success((r, x)) => {
-//
-//         // 1) handle current request
-//         respond(x, token, handler(r))
-//
-//         // 2) handle next request
-//         while (token.nonCancelled) {
-//           handleCancelableRequest(token)
-//         }
-//       }
-//      }
-//    }
-//
-//    Future.run() {
-//      handleCancelableRequest
-//    }
-//    // onComplete {
-//    //   case _ => ls.unsubscribe()
-//    // }
   }
 
 }
