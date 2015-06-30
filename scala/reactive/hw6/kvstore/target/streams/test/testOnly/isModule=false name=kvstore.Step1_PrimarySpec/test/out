@@ -1,0 +1,27 @@
+[0m[[0minfo[0m] [0m[32mStep1_PrimarySpec:[0m[0m
+[0m[[0minfo[0m] [0m[31m- case1: Primary (in isolation) should properly register itself to the provided Arbiter *** FAILED ***[0m[0m
+[0m[[0minfo[0m] [0m[31m  java.lang.AssertionError: assertion failed: timeout (3 seconds) during expectMsg while waiting for Join[0m[0m
+[0m[[0minfo[0m] [0m[31m  at scala.Predef$.assert(Predef.scala:165)[0m[0m
+[0m[[0minfo[0m] [0m[31m  at akka.testkit.TestKitBase$class.expectMsg_internal(TestKit.scala:338)[0m[0m
+[0m[[0minfo[0m] [0m[31m  at akka.testkit.TestKitBase$class.expectMsg(TestKit.scala:315)[0m[0m
+[0m[[0minfo[0m] [0m[31m  at akka.testkit.TestKit.expectMsg(TestKit.scala:718)[0m[0m
+[0m[[0minfo[0m] [0m[31m  at kvstore.Step1_PrimarySpec$$anonfun$1.apply$mcV$sp(Step1_PrimarySpec.scala:36)[0m[0m
+[0m[[0minfo[0m] [0m[31m  at kvstore.Step1_PrimarySpec$$anonfun$1.apply(Step1_PrimarySpec.scala:32)[0m[0m
+[0m[[0minfo[0m] [0m[31m  at kvstore.Step1_PrimarySpec$$anonfun$1.apply(Step1_PrimarySpec.scala:32)[0m[0m
+[0m[[0minfo[0m] [0m[31m  at org.scalatest.Transformer$$anonfun$apply$1.apply$mcV$sp(Transformer.scala:22)[0m[0m
+[0m[[0minfo[0m] [0m[31m  at org.scalatest.OutcomeOf$class.outcomeOf(OutcomeOf.scala:85)[0m[0m
+[0m[[0minfo[0m] [0m[31m  at org.scalatest.OutcomeOf$.outcomeOf(OutcomeOf.scala:104)[0m[0m
+[0m[[0minfo[0m] [0m[31m  ...[0m[0m
+[0m[[0minfo[0m] [0m[31m- case2: Primary (in isolation) should react properly to Insert, Remove, Get *** FAILED ***[0m[0m
+[0m[[0minfo[0m] [0m[31m  java.lang.AssertionError: assertion failed: timeout (3 seconds) during expectMsg while waiting for Join[0m[0m
+[0m[[0minfo[0m] [0m[31m  at scala.Predef$.assert(Predef.scala:165)[0m[0m
+[0m[[0minfo[0m] [0m[31m  at akka.testkit.TestKitBase$class.expectMsg_internal(TestKit.scala:338)[0m[0m
+[0m[[0minfo[0m] [0m[31m  at akka.testkit.TestKitBase$class.expectMsg(TestKit.scala:315)[0m[0m
+[0m[[0minfo[0m] [0m[31m  at akka.testkit.TestKit.expectMsg(TestKit.scala:718)[0m[0m
+[0m[[0minfo[0m] [0m[31m  at kvstore.Step1_PrimarySpec$$anonfun$2.apply$mcV$sp(Step1_PrimarySpec.scala:44)[0m[0m
+[0m[[0minfo[0m] [0m[31m  at kvstore.Step1_PrimarySpec$$anonfun$2.apply(Step1_PrimarySpec.scala:39)[0m[0m
+[0m[[0minfo[0m] [0m[31m  at kvstore.Step1_PrimarySpec$$anonfun$2.apply(Step1_PrimarySpec.scala:39)[0m[0m
+[0m[[0minfo[0m] [0m[31m  at org.scalatest.Transformer$$anonfun$apply$1.apply$mcV$sp(Transformer.scala:22)[0m[0m
+[0m[[0minfo[0m] [0m[31m  at org.scalatest.OutcomeOf$class.outcomeOf(OutcomeOf.scala:85)[0m[0m
+[0m[[0minfo[0m] [0m[31m  at org.scalatest.OutcomeOf$.outcomeOf(OutcomeOf.scala:104)[0m[0m
+[0m[[0minfo[0m] [0m[31m  ...[0m[0m
