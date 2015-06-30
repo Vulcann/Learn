@@ -1,0 +1,67 @@
+<html>
+<head>
+<title>QueryHW22.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.ln { color: rgb(0,0,0); font-weight: normal; font-style: normal; }
+.s0 { color: rgb(0,0,128); font-weight: bold; }
+.s1 { }
+.s2 { color: rgb(128,128,128); font-style: italic; }
+.s3 { color: rgb(0,128,0); font-weight: bold; }
+.s4 { color: rgb(0,0,255); }
+</style>
+</head>
+<BODY BGCOLOR="#ffffff">
+<TABLE CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#C0C0C0" >
+<TR><TD><CENTER>
+<FONT FACE="Arial, Helvetica" COLOR="#000000">
+QueryHW22.java</FONT>
+</center></TD></TR></TABLE>
+<pre>
+
+<span class="s0">package </span><span class="s1">com.tengen; 
+ 
+</span><span class="s0">import </span><span class="s1">com.mongodb.*; 
+ 
+</span><span class="s0">import </span><span class="s1">java.net.UnknownHostException; 
+ 
+</span><span class="s2">/** 
+ * Created by vulcann on 26/06/14. 
+ */</span><span class="s1"> 
+</span><span class="s0">public class </span><span class="s1">QueryHW22 { 
+    </span><span class="s0">public static void </span><span class="s1">main(String[] args) </span><span class="s0">throws </span><span class="s1">UnknownHostException { 
+        MongoClient mongo = </span><span class="s0">new </span><span class="s1">MongoClient(</span><span class="s0">new </span><span class="s1">ServerAddress(</span><span class="s3">&quot;localhost&quot;</span><span class="s1">, </span><span class="s4">27017</span><span class="s1">)); 
+        DB database = mongo.getDB(</span><span class="s3">&quot;students&quot;</span><span class="s1">); 
+        DBCollection collection = database.getCollection(</span><span class="s3">&quot;grades&quot;</span><span class="s1">); 
+ 
+        DBObject queryDoc =  </span><span class="s0">new </span><span class="s1">BasicDBObject(); 
+        queryDoc.put(</span><span class="s3">&quot;type&quot;</span><span class="s1">, </span><span class="s3">&quot;homework&quot;</span><span class="s1">); 
+        DBObject sortDoc = </span><span class="s0">new </span><span class="s1">BasicDBObject(); 
+        sortDoc.put(</span><span class="s3">&quot;student_id&quot;</span><span class="s1">, </span><span class="s4">1</span><span class="s1">); 
+        sortDoc.put(</span><span class="s3">&quot;score&quot;</span><span class="s1">, -</span><span class="s4">1</span><span class="s1">); 
+ 
+        DBCursor cursor = collection.find(queryDoc).sort(sortDoc); 
+        </span><span class="s0">try </span><span class="s1">{ 
+            DBObject pre; 
+            DBObject cur; 
+            </span><span class="s0">if </span><span class="s1">(cursor.hasNext()) { 
+                cur = cursor.next(); 
+                </span><span class="s0">while </span><span class="s1">(cursor.hasNext()) 
+                { 
+                    pre = cur; 
+                    cur = cursor.next(); 
+                    </span><span class="s0">if </span><span class="s1">(!pre.get(</span><span class="s3">&quot;student_id&quot;</span><span class="s1">).equals(cur.get(</span><span class="s3">&quot;student_id&quot;</span><span class="s1">))) 
+                    { 
+                        collection.remove(</span><span class="s0">new </span><span class="s1">BasicDBObject(</span><span class="s3">&quot;_id&quot;</span><span class="s1">, pre.get(</span><span class="s3">&quot;_id&quot;</span><span class="s1">))); 
+                    } 
+                } 
+                collection.remove(</span><span class="s0">new </span><span class="s1">BasicDBObject(</span><span class="s3">&quot;_id&quot;</span><span class="s1">, cur.get(</span><span class="s3">&quot;_id&quot;</span><span class="s1">))); 
+            } 
+        } </span><span class="s0">finally </span><span class="s1">{ 
+            cursor.close(); 
+        } 
+    } 
+} 
+</span></pre>
+</body>
+</html>

@@ -1,0 +1,25 @@
+2014-07-05T11:21:04.210+0200 [initandlisten] MongoDB starting : pid=3645 port=27017 dbpath=/data/rs1 64-bit host=Weiyus-MacBook-Pro-3.local
+2014-07-05T11:21:04.210+0200 [initandlisten] 
+2014-07-05T11:21:04.211+0200 [initandlisten] ** WARNING: soft rlimits too low. Number of files is 256, should be at least 1000
+2014-07-05T11:21:04.211+0200 [initandlisten] db version v2.6.1
+2014-07-05T11:21:04.211+0200 [initandlisten] git version: 4b95b086d2374bdcfcdf2249272fb552c9c726e8
+2014-07-05T11:21:04.211+0200 [initandlisten] build info: Darwin mci-osx108-6.build.10gen.cc 12.5.0 Darwin Kernel Version 12.5.0: Sun Sep 29 13:33:47 PDT 2013; root:xnu-2050.48.12~1/RELEASE_X86_64 x86_64 BOOST_LIB_VERSION=1_49
+2014-07-05T11:21:04.211+0200 [initandlisten] allocator: system
+2014-07-05T11:21:04.212+0200 [initandlisten] options: { net: { port: 27017 }, processManagement: { fork: true }, replication: { oplogSizeMB: 64, replSet: "m101" }, storage: { dbPath: "/data/rs1", smallFiles: true }, systemLog: { destination: "file", path: "1.log" } }
+2014-07-05T11:21:04.285+0200 [initandlisten] exception in initAndListen: 10296 
+*********************************************************************
+ ERROR: dbpath (/data/rs1) does not exist.
+ Create this directory or give existing directory in --dbpath.
+ See http://dochub.mongodb.org/core/startingandstoppingmongo
+*********************************************************************
+, terminating
+2014-07-05T11:21:04.286+0200 [initandlisten] dbexit: 
+2014-07-05T11:21:04.286+0200 [initandlisten] shutdown: going to close listening sockets...
+2014-07-05T11:21:04.286+0200 [initandlisten] shutdown: going to flush diaglog...
+2014-07-05T11:21:04.286+0200 [initandlisten] shutdown: going to close sockets...
+2014-07-05T11:21:04.287+0200 [initandlisten] shutdown: waiting for fs preallocator...
+2014-07-05T11:21:04.287+0200 [initandlisten] shutdown: lock for final commit...
+2014-07-05T11:21:04.287+0200 [initandlisten] shutdown: final commit...
+2014-07-05T11:21:04.288+0200 [initandlisten] shutdown: closing all files...
+2014-07-05T11:21:04.344+0200 [initandlisten] closeAllFiles() finished
+2014-07-05T11:21:04.344+0200 [initandlisten] dbexit: really exiting now
